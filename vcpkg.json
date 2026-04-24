@@ -1,0 +1,17 @@
+{
+  "name": "cosmoapp",
+  "version-string": "0.1.0",
+  "dependencies": [
+    "cli11",
+    "nlohmann-json",
+    "asio",
+    "cpp-httplib",
+    "spdlog",
+    "ada",
+    "stduuid",
+    "reproc",
+    "cpptrace",
+    "date",
+    "csv"
+  ]
+}

@@ -1,0 +1,47 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install Cosmopolitan Libc
+      run: |
+        # Download and extract Cosmopolitan Libc (v2.0.4 as an example)
+        COSMOPOLITAN_VERSION=v2.0.4
+        wget -q https://github.com/jart/cosmopolitan/releases/download/${COSMOPOLITAN_VERSION}/cosmopolitan-${COSMOPOLITAN_VERSION}.zip
+        unzip -q cosmopolitan-${COSMOPOLITAN_VERSION}.zip
+        # The cosmocc wrapper is in the bin directory
+        echo "${GITHUB_WORKSPACE}/cosmopolitan-${COSMOPOLITAN_VERSION}/bin" >> $GITHUB_PATH
+
+    - name: Set up CMake
+      uses: lukka/get-cmake@v3
+
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cd build
+        cmake .. -DCMAKE_TOOLCHAIN_FILE=../cosmopolitan.cmake
+
+    - name: Build
+      run: |
+        cd build
+        cmake --build . --config Release
+
+    - name: Test (Unit Tests)
+      run: |
+        cd build
+        ctest --output-on-failure
+
+    - name: Run the executable (basic sanity check)
+      run: |
+        cd build
+        ./cosmoapp --help
